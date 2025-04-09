@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Redirect</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+        .manual-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+        .button {
+            display: block;
+            padding: 12px 20px;
+            background-color: #0d6efd;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .hide {
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .manual-buttons {
+                flex-direction: row;
+                justify-content: center;
+                max-width: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">Redirecting you to the app store...</div>
+    
+    <div id="manual-buttons" class="manual-buttons hide">
+        <a id="ios-button" href="#" class="button">Download on the App Store</a>
+        <a id="android-button" href="#" class="button">Get it on Google Play</a>
+    </div>
+
+    <script>
+        // App redirects configuration
+        const restaurants = {
+            default: {
+                iosAppLink: "https://apps.apple.com/app/default-app-id",
+                androidAppLink: "https://play.google.com/store/apps/details?id=default.package.name"
+            },
+            restaurant1: {
+                iosAppLink: "https://apps.apple.com/app/restaurant1-id",
+                androidAppLink: "https://play.google.com/store/apps/details?id=restaurant1.package.name"
+            },
+            restaurant2: {
+                iosAppLink: "https://apps.apple.com/app/restaurant2-id",
+                androidAppLink: "https://play.google.com/store/apps/details?id=restaurant2.package.name"
+            },
+            restaurant3: {
+                iosAppLink: "https://apps.apple.com/app/restaurant3-id",
+                androidAppLink: "https://play.google.com/store/apps/details?id=restaurant3.package.name"
+            },
+            // Add more restaurants as needed
+        };
+
+        // Get restaurant from URL
+        function getRestaurantFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantParam = urlParams.get('r');
+            
+            if (restaurantParam && restaurants[restaurantParam]) {
+                return restaurantParam;
+            }
+            
+            return "default";
+        }
+
+        // Main function
+        function redirectToAppStore() {
+            const restaurantKey = getRestaurantFromURL();
+            const currentRestaurant = restaurants[restaurantKey];
+            
+            // Update button links (for desktop fallback)
+            const iosButtonEl = document.getElementById('ios-button');
+            const androidButtonEl = document.getElementById('android-button');
+            iosButtonEl.href = currentRestaurant.iosAppLink;
+            androidButtonEl.href = currentRestaurant.androidAppLink;
+            
+            // Detect device and redirect
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            
+            // iOS detection
+            const isIOS = /iphone|ipad|ipod/i.test(userAgent.toLowerCase());
+            
+            // Android detection
+            const isAndroid = /android/i.test(userAgent.toLowerCase());
+            
+            if (isIOS) {
+                // Immediate redirect to iOS App Store
+                window.location.href = currentRestaurant.iosAppLink;
+            } else if (isAndroid) {
+                // Immediate redirect to Google Play Store
+                window.location.href = currentRestaurant.androidAppLink;
+            } else {
+                // Desktop or unknown device - show both options
+                document.getElementById('loading').classList.add('hide');
+                document.getElementById('manual-buttons').classList.remove('hide');
+            }
+        }
+
+        // Initialize immediately
+        redirectToAppStore();
+    </script>
+</body>
+</html>
